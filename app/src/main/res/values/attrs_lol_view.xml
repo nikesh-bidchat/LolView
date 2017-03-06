@@ -1,0 +1,14 @@
+<resources>
+    <declare-styleable name="CustomeLolView">
+        <attr name="exampleString" format="string" />
+        <attr name="exampleDimension" format="dimension" />
+        <attr name="exampleColor" format="color" />
+        <attr name="exampleDrawable" format="color|reference" />
+    </declare-styleable>
+    <declare-styleable name="LolView">
+        <attr name="lolExampleString" format="string" />
+        <attr name="lolExampleDimension" format="dimension" />
+        <attr name="lolExampleColor" format="color" />
+        <attr name="lolExampleDrawable" format="color|reference" />
+    </declare-styleable>
+</resources>
