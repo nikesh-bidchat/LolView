@@ -16,7 +16,7 @@ import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView mImageLetterO, mImageSmiley;
-    private int mSmileyDispositionHeight = 0;
+    private int mSmileyDispositionHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
