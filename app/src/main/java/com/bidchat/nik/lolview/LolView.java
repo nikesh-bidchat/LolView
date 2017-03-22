@@ -43,7 +43,8 @@ public class LolView extends RelativeLayout {
 
         final ViewGroup rootView = (ViewGroup) view.getRootView();
         LinearLayout linearRootView = new LinearLayout(context);
-        RelativeLayout.LayoutParams layoutParamsGrowShrink = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        RelativeLayout.LayoutParams layoutParamsGrowShrink = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        layoutParamsGrowShrink.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         linearRootView.setLayoutParams(layoutParamsGrowShrink);
         linearRootView.setOrientation(LinearLayout.HORIZONTAL);
 
