@@ -1,18 +1,17 @@
 package com.bidchat.nik.lolview;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -23,7 +22,9 @@ import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView mImageLetterO, mImageSmiley;
+    private LinearLayout linearRootView;
     private int mSmileyDispositionHeight;
+    private final int REPEAT_COUNT = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
         initiateView(newUser, this);
     }
 
+    /**
+     * @param user    - the User object
+     * @param context - context to be passed
+     */
     public void initiateView(User user, final Context context) {
         final ViewGroup rootView = (ViewGroup) findViewById(android.R.id.content);
 
@@ -42,14 +47,17 @@ public class MainActivity extends AppCompatActivity {
         RelativeLayout.LayoutParams layoutRootParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         relativeRootView.setLayoutParams(layoutRootParams);
 
-        LinearLayout linearRootView = new LinearLayout(context);
+        linearRootView = new LinearLayout(context);
         int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 200, getResources().getDisplayMetrics());
         RelativeLayout.LayoutParams layoutRootLinearParams = new RelativeLayout.LayoutParams(px, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutRootLinearParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
         linearRootView.setOrientation(LinearLayout.VERTICAL);
         linearRootView.setLayoutParams(layoutRootLinearParams);
 
-        /**     Animation Layer     */
+        /*
+        Start of Animation Layer
+         */
+
         LinearLayout linearTopView = new LinearLayout(context);
         LinearLayout.LayoutParams layoutTopParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutTopParams.gravity = Gravity.CENTER_VERTICAL;
@@ -106,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                         layoutParamsAnimationHolder.gravity = Gravity.BOTTOM;
                         layoutParamsAnimationHolder.weight = 1;
                         relativeAnimationHolder.setLayoutParams(layoutParamsAnimationHolder);
-                        startAnimation(mSmileyDispositionHeight);
+                        startObjectAnimator(mSmileyDispositionHeight, REPEAT_COUNT);
                         return true;
                     }
                 });
@@ -114,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         linearTopView.addView(relativeAnimationHolder);
-
 
         // Left Letter L
         ImageView imageRightLetter = new ImageView(context);
@@ -126,7 +133,13 @@ public class MainActivity extends AppCompatActivity {
         imageRightLetter.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.mipmap.ic_letter_l));
         linearTopView.addView(imageRightLetter);
 
-        /**     Profile Layer     */
+        /*
+        End of Animation Layer
+         */
+
+        /*
+        Start of Profile Layer
+         */
         LinearLayout linearBottomView = new LinearLayout(context);
         LinearLayout.LayoutParams layoutBottomParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         linearBottomView.setLayoutParams(layoutBottomParams);
@@ -148,16 +161,19 @@ public class MainActivity extends AppCompatActivity {
         imageUser.setOnClickListener(new onProfileClickListener(context, user.getUserId()));
         linearBottomView.addView(imageUser);
 
-        TextView textUserName = new TextView(context);
+        TextView textUsername = new TextView(context);
         LinearLayout.LayoutParams layoutParamsTextUserName = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParamsTextUserName.gravity = Gravity.CENTER_VERTICAL;
-        textUserName.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+        textUsername.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
         layoutParamsTextUserName.weight = 3f;
-        textUserName.setLayoutParams(layoutParamsTextUserName);
-        textUserName.setText(user.getUserName());
-        textUserName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        textUserName.setOnClickListener(new onProfileClickListener(context, user.getUserId()));
-        linearBottomView.addView(textUserName);
+        textUsername.setLayoutParams(layoutParamsTextUserName);
+        textUsername.setText(user.getUserName());
+        textUsername.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        textUsername.setOnClickListener(new onProfileClickListener(context, user.getUserId()));
+        linearBottomView.addView(textUsername);
+        /*
+        End of Profile Layer
+         */
 
         linearRootView.addView(linearTopView);
         linearRootView.addView(linearBottomView);
@@ -165,25 +181,47 @@ public class MainActivity extends AppCompatActivity {
         rootView.addView(relativeRootView);
     }
 
-    public void startAnimation(int translateToPosition) {
+    /**
+     * @param translateToPosition  - specify extent wer the image needs to move
+     * @param animationRepeatCount - define the repeat count for animation
+     */
+    public void startObjectAnimator(int translateToPosition, int animationRepeatCount) {
         final int ANIMATION_TIME = 500;
+        ObjectAnimator slideIn = ObjectAnimator.ofFloat(linearRootView,
+                "translationX", -1500f, 0f);
+        slideIn.setDuration(ANIMATION_TIME);
 
-        Animation animationTranslate = new TranslateAnimation(0, 0, translateToPosition, 0);// 0,0 is the current coordinates
-        animationTranslate.setFillAfter(true); // Needed to keep the result of the animation
-        animationTranslate.setDuration(ANIMATION_TIME);
-        animationTranslate.setRepeatCount(Animation.INFINITE);
-        animationTranslate.setRepeatMode(Animation.REVERSE);
-        animationTranslate.setInterpolator(new FastOutLinearInInterpolator());
-        mImageSmiley.startAnimation(animationTranslate);// to start animation obviously
+        mImageLetterO.setPivotY(mImageLetterO.getHeight());
+        mImageLetterO.setPivotX(mImageLetterO.getWidth() / 2);
+        ObjectAnimator scaleX = ObjectAnimator.ofFloat(mImageLetterO, "scaleX", 1f, 0f);
+        scaleX.setDuration(ANIMATION_TIME);
+        scaleX.setRepeatMode(ValueAnimator.REVERSE);
+        scaleX.setRepeatCount(animationRepeatCount);
 
-        Animation animationScale = new ScaleAnimation(1, 1, 0, 1, Animation.ABSOLUTE, 0,
-                Animation.RELATIVE_TO_SELF, 1);
-        animationScale.setFillAfter(true); // Needed to keep the result of the animation
-        animationScale.setDuration(ANIMATION_TIME);
-        animationScale.setRepeatCount(Animation.INFINITE);
-        animationScale.setRepeatMode(Animation.REVERSE);
-        animationScale.setInterpolator(new FastOutLinearInInterpolator());
-        mImageLetterO.startAnimation(animationScale);
+        ObjectAnimator scaleY = ObjectAnimator.ofFloat(mImageLetterO, "scaleY", 1f, 0f);
+        scaleY.setDuration(ANIMATION_TIME);
+        scaleY.setRepeatMode(ValueAnimator.REVERSE);
+        scaleY.setRepeatCount(animationRepeatCount);
+
+        ObjectAnimator rotate = ObjectAnimator.ofFloat(mImageSmiley,
+                "rotation", 0f, 360f);
+        rotate.setDuration(ANIMATION_TIME);
+        rotate.setRepeatMode(ValueAnimator.REVERSE);
+        rotate.setRepeatCount(animationRepeatCount);
+
+        ObjectAnimator slideUpDown = ObjectAnimator.ofFloat(mImageSmiley,
+                "translationY", 0f, translateToPosition);
+        slideUpDown.setDuration(ANIMATION_TIME);
+        slideUpDown.setRepeatMode(ValueAnimator.REVERSE);
+        slideUpDown.setRepeatCount(animationRepeatCount);
+
+        ObjectAnimator slideOut = ObjectAnimator.ofFloat(linearRootView,
+                "translationX", 0f, 1500f);
+        slideOut.setDuration(ANIMATION_TIME);
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.play(scaleY).with(scaleX).with(slideUpDown).with(rotate).after(slideIn).before(slideOut);
+        animatorSet.start();
     }
 
     private class onProfileClickListener implements View.OnClickListener {
